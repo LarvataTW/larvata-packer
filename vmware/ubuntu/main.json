@@ -12,7 +12,7 @@
     "vsphere_vm_type": "ubuntu64Guest",
     "vsphere_vm_name": "ubuntu-18.04.2-template",
     "vsphere_vm_username": "ubuntu",
-    "vsphere_vm_password": ""
+    "vsphere_vm_password": "12345678"
   },
 
   "sensitive-variables": [
@@ -87,7 +87,7 @@
     {
       "type": "shell",
       "script": "init.sh",
-      "execute_command": "echo '' | sudo -S env {{ .Vars }} {{ .Path }}"
+      "execute_command": "echo '12345678' | sudo -S env {{ .Vars }} {{ .Path }}"
     }
   ]
 }
