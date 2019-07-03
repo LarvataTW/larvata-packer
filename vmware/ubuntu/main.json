@@ -1,0 +1,93 @@
+{
+  "variables": {
+    "home": "{{env `HOME`}}",
+    "vsphere_user": "{{env `TF_VAR_vsphere_user`}}",
+    "vsphere_password": "{{env `TF_VAR_vsphere_password`}}",
+    "vsphere_server": "{{env `TF_VAR_vsphere_server`}}",
+    "vsphere_host": "{{env `TF_VAR_vsphere_host`}}",
+    "vsphere_datastore": "{{env `TF_VAR_vsphere_datastore`}}",
+    "vsphere_vm_folder": "{{env `TF_VAR_vsphere_vm_folder`}}",
+    "vsphere_vm_network": "{{env `TF_VAR_vsphere_vm_network`}}",
+    "vsphere_vm_iso": "{{env `TF_VAR_vsphere_vm_iso`}}",
+    "vsphere_vm_type": "ubuntu64Guest",
+    "vsphere_vm_name": "ubuntu-18.04.2-template",
+    "vsphere_vm_username": "ubuntu",
+    "vsphere_vm_password": ""
+  },
+
+  "sensitive-variables": [
+    "vsphere_server",
+    "vsphere_user",
+    "vsphere_password"
+  ],
+
+  "builders": [
+    {
+      "type": "vsphere-iso",
+
+      "vcenter_server":      "{{user `vsphere_server`}}",
+      "username":            "{{user `vsphere_user`}}",
+      "password":            "{{user `vsphere_password`}}",
+      "insecure_connection": "true",
+
+      "cluster": "Cluster",
+      "datastore": "{{user `vsphere_datastore`}}",
+      "host":     "{{user `vsphere_host`}}",
+      "folder": "{{user `vsphere_vm_folder`}}",
+      "vm_name": "{{user `vsphere_vm_name`}}",
+
+      "guest_os_type": "{{user `vsphere_vm_type`}}",
+
+      "ssh_username": "{{user `vsphere_vm_username`}}",
+      "ssh_password": "{{user `vsphere_vm_password`}}",
+
+      "CPUs":             2,
+      "RAM":              4096,
+      "RAM_reserve_all": false,
+
+      "disk_controller_type":  "pvscsi",
+      "disk_size":        20480,
+      "disk_thin_provisioned": true,
+
+      "network_card": "vmxnet3",
+      "network": "{{user `vsphere_vm_network`}}",
+
+      "convert_to_template": true,
+
+      "iso_paths": [
+        "{{user `vsphere_vm_iso`}}"
+      ],
+
+      "floppy_files": [
+        "{{template_dir}}/preseed.cfg"
+      ],
+
+      "boot_command": [
+        "<enter><wait><f6><wait><esc><wait>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs><bs><bs><bs><bs><bs><bs><bs>",
+        "<bs><bs><bs>",
+        "/install/vmlinuz",
+        " initrd=/install/initrd.gz",
+        " priority=critical",
+        " locale=en_US",
+        " file=/media/preseed.cfg",
+        "<enter>"
+      ]
+    }
+  ],
+
+  "provisioners": [
+    {
+      "type": "shell",
+      "script": "init.sh",
+      "execute_command": "echo '' | sudo -S env {{ .Vars }} {{ .Path }}"
+    }
+  ]
+}
