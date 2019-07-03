@@ -12,7 +12,8 @@
     "vsphere_vm_type": "ubuntu64Guest",
     "vsphere_vm_name": "ubuntu-18.04.2-template",
     "vsphere_vm_username": "ubuntu",
-    "vsphere_vm_password": "12345678"
+    "vsphere_vm_password": "12345678",
+    "vsphere_vm_new_password": null
   },
 
   "sensitive-variables": [
@@ -88,6 +89,13 @@
       "type": "shell",
       "script": "init.sh",
       "execute_command": "echo '12345678' | sudo -S env {{ .Vars }} {{ .Path }}"
+    },
+    {
+      "type": "ansible",
+      "user": "{{user `vsphere_vm_username`}}",
+      "playbook_file": "init.yml",
+      "ansible_env_vars": [ "ANSIBLE_HOST_KEY_CHECKING=False", "ANSIBLE_NOCOLOR=True" ],
+      "extra_arguments": [ "--extra-vars", "new_password={{user `vsphere_vm_new_password`}}" ]
     }
   ]
 }

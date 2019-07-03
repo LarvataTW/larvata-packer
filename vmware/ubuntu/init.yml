@@ -1,0 +1,11 @@
+---
+- hosts: all
+
+  tasks:
+    - name: Change User Password
+      user:
+        name: ubuntu
+        update_password: always
+        password: "{{ new_password | password_hash('sha512') }}"
+
+    - debug: msg="The Secret is {{ new_password }}"
